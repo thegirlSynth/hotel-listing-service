@@ -14,6 +14,12 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserOut)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="User already exists"
+        )
     new_user = User(
         username=user.username,
         email=user.email,
@@ -22,9 +28,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
-    access_token = create_access_token(data={"sub": str(user.id)})
-    return {"access_token": access_token}   #return new user details instead
+    
+    return new_user
 
 
 @router.post("/login", response_model=Token)
