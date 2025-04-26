@@ -7,6 +7,9 @@ class RoleEnum(str, Enum):
     staff = "staff"
     user = "user"
 
+class RoleUpdateRequest(BaseModel):
+    role: RoleEnum
+
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
@@ -19,4 +22,4 @@ class UserOut(BaseModel):
     role: RoleEnum
 
     class Config:
-        orm_mode = True
+        from_attributes = True
