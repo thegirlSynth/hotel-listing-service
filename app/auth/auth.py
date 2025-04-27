@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from app.core.config import settings
@@ -15,4 +16,4 @@ def verify_token(token: str):
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
     except JWTError:
-        return None
+        raise HTTPException(status_code=401, detail="Token is invalid or expired")
