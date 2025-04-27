@@ -60,9 +60,17 @@ Create a `.env` file in the root directory of the project, and add the following
 ```bash
 # .env file (example)
 
+# Database connection URL for SQLAlchemy
+# Format: postgresql+psycopg2://<username>:<password>@<host>/<database_name>
 DATABASE_URL=postgresql+psycopg2://username:password@localhost/your_database_name
+
+# Secret key used to sign JWT tokens
 SECRET_KEY=your-secret-key
+
+# Algorithm used for encoding JWT tokens (commonly HS256)
 ALGORITHM=HS256
+
+# Access token expiry time in minutes (e.g., 60 minutes = 1 hour)
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 
 ```
