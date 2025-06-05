@@ -1,4 +1,3 @@
-# seed.py
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal, engine
 from app.db.base import Base
@@ -6,6 +5,11 @@ from app.models.hotel import Hotel
 from app.models.room import Room
 from app.models.booking import Booking
 from datetime import date, timedelta
+from faker import Faker
+import random
+
+# Initialize Faker
+fake = Faker()
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -16,38 +20,60 @@ db: Session = SessionLocal()
 db.query(Booking).delete()
 db.query(Room).delete()
 db.query(Hotel).delete()
-
-# Add sample hotels
-hotels = [
-    Hotel(name="Eko Hotel", city="Lagos", tags=["wifi", "pool", "breakfast"]),
-    Hotel(name="Lagos Continental", city="Lagos", tags=["spa", "sea view"]),
-    Hotel(name="Transcorp Hilton", city="Abuja", tags=["conference", "pool"]),
-]
-
-db.add_all(hotels)
 db.commit()
 
-# Add rooms for each hotel
-rooms = [
-    Room(hotel_id=hotels[0].id, room_type="Standard", price_per_night=35000, max_guests=2),
-    Room(hotel_id=hotels[0].id, room_type="Deluxe", price_per_night=45000, max_guests=3),
-    Room(hotel_id=hotels[1].id, room_type="Sea View", price_per_night=50000, max_guests=2),
-    Room(hotel_id=hotels[2].id, room_type="Executive", price_per_night=60000, max_guests=4),
+# Sample tags
+tag_pool = [
+    "wifi", "pool", "breakfast", "spa", "gym", "sea view", "conference",
+    "pet-friendly", "bar", "free parking", "restaurant", "airport shuttle",
+    "family-friendly", "business center"
 ]
+cities = ["Lagos", "Abuja"]
+room_types = ["Standard", "Deluxe", "Executive", "Suite", "Penthouse"]
 
-db.add_all(rooms)
+# Add 15 realistic hotels
+hotels = []
+for _ in range(15):
+    hotel_name = f"{fake.last_name()} {random.choice(['Hotel', 'Resort', 'Suites', 'Inn'])}"
+    city = random.choice(cities)
+    tags = random.sample(tag_pool, k=random.randint(2, 5))
+
+    hotel = Hotel(name=hotel_name, city=city, tags=tags)
+    db.add(hotel)
+    hotels.append(hotel)
+
 db.commit()
 
-# Add some sample bookings (to test availability filtering)
+# Add rooms to hotels
+rooms = []
+for hotel in hotels:
+    num_rooms = random.randint(3, 7)
+    for _ in range(num_rooms):
+        room = Room(
+            hotel_id=hotel.id,
+            room_type=random.choice(room_types),
+            price_per_night=random.randint(25000, 120000),
+            max_guests=random.choice([1, 2, 3, 4, 5])
+        )
+        db.add(room)
+        rooms.append(room)
+
+db.commit()
+
+# Add 30 bookings with varying lengths and overlap
 today = date.today()
-bookings = [
-    Booking(room_id=rooms[0].id, check_in_date=today + timedelta(days=5), check_out_data=today + timedelta(days=7)),
-    Booking(room_id=rooms[2].id, check_in_date=today + timedelta(days=3), check_out_data=today + timedelta(days=10)),
-]
+for _ in range(30):
+    room = random.choice(rooms)
+    check_in_offset = random.randint(1, 30)
+    stay_length = random.randint(1, 7)
+    booking = Booking(
+        room_id=room.id,
+        check_in_date=today + timedelta(days=check_in_offset),
+        check_out_date=today + timedelta(days=check_in_offset + stay_length)
+    )
+    db.add(booking)
 
-db.add_all(bookings)
 db.commit()
-
 db.close()
 
 print("Sample data seeded successfully.")
