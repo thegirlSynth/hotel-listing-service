@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.auth.dependencies import get_db
-from app.schemas.search import HotelSearchRequest, HotelSearchResult
+from app.schemas.search import HotelSearchResult
 from app.models.hotel import Hotel
 from app.models.room import Room
 from app.models.booking import Booking
-from sqlalchemy import and_, or_, not_, exists, func
-
+from sqlalchemy import and_, or_, func, select
+from datetime import date
 
 router  = APIRouter()
 
@@ -15,19 +15,16 @@ router  = APIRouter()
 def search_hotels(
     query: str = Query(...),
     guests: int = Query(...),
-    checkin: str = Query(...),
-    checkout: str = Query(...),
+    checkin: date = Query(...),
+    checkout: date = Query(...),
     db: Session = Depends(get_db),
 ):
 
-    checkin_date = checkin
-    checkout_date = checkout
-
-    subquery = db.query(Booking.room_id).filter(
+    subquery = select(Booking.room_id).where(
         and_(
             Booking.status == "confirmed",
-            Booking.check_in_date < checkout_date,
-            Booking.check_out_data > checkin_date
+            Booking.check_in_date < checkout,
+            Booking.check_out_date > checkin
         )
     ).subquery()
 
@@ -47,7 +44,7 @@ def search_hotels(
             Room.max_guests >= guests,
             ~Room.id.in_(subquery)
         )
-        .group_by(Hotel.id)
+        .group_by(Hotel.id, Hotel.name, Hotel.tags, Hotel.city)
         .limit(50)
         .all()
     )
