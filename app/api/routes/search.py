@@ -26,7 +26,7 @@ def search_hotels(
             Booking.check_in_date < checkout,
             Booking.check_out_date > checkin
         )
-    ).subquery()
+    ).scalar_subquery()
 
     hotels = (
         db.query(Hotel.id.label("hotel_id"),
