@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Text, DateTime, ARRAY
+from sqlalchemy import Column, Integer, String, Boolean, Float, Text, DateTime
+from app.models.amenity import hotel_amenities
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.base import Base
@@ -16,14 +17,11 @@ class Hotel(Base):
     state = Column(String)
     country = Column(String)
     star_rating = Column(Integer)
-    price_per_night = Column(Float)
-    max_guests = Column(Integer)
-    price_per_night = Column(Float)
-    max_guests = Column(Integer)
-    tags = Column(ARRAY(String))
     is_featured = Column(Boolean, default=False)
     category = Column(String)
     views_count = Column(Integer, default=0)
     created_at = Column(DateTime, server_default=func.now())
 
     rooms = relationship("Room", back_populates="hotel", cascade="all, delete")
+
+    amenities = relationship("Amenity", secondary=hotel_amenities, backref="hotels")

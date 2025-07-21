@@ -33,7 +33,7 @@ def search_hotels(
                  Hotel.name.label("hotel_name"),
                  Hotel.city,
                  func.min(Room.price_per_night).label("lowest_price"),
-                 Hotel.tags)
+                 Hotel.amenities)
         .join(Room, Hotel.id == Room.hotel_id)
         .filter(
             or_(
@@ -44,7 +44,7 @@ def search_hotels(
             Room.max_guests >= guests,
             ~Room.id.in_(subquery)
         )
-        .group_by(Hotel.id, Hotel.name, Hotel.tags, Hotel.city)
+        .group_by(Hotel.id, Hotel.name, Hotel.amenities, Hotel.city)
         .limit(50)
         .all()
     )
