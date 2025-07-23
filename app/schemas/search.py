@@ -14,6 +14,12 @@ class HotelSearchResult(BaseModel):
     hotel_id: int
     hotel_name: str
     city: str
+    state: str
     lowest_price: float
-    tags: List[str]
+    amenities: List[str]
+    image_url: str
+    star_rating: float
+    views_count: int
+    min_no_guests: int
+    max_no_guests: int
 

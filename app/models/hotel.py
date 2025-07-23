@@ -16,12 +16,12 @@ class Hotel(Base):
     city = Column(String, index=True)
     state = Column(String)
     country = Column(String)
-    star_rating = Column(Integer)
+    star_rating = Column(Float)
     is_featured = Column(Boolean, default=False)
     category = Column(String)
     views_count = Column(Integer, default=0)
     created_at = Column(DateTime, server_default=func.now())
+    image = Column(String)
 
     rooms = relationship("Room", back_populates="hotel", cascade="all, delete")
-
     amenities = relationship("Amenity", secondary=hotel_amenities, backref="hotels")

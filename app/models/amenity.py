@@ -13,6 +13,6 @@ class Amenity(Base):
 hotel_amenities = Table(
     "hotel_amenities",
     Base.metadata,
-    Column("hotel_id", Integer, ForeignKey("hotels.id"), primary_key=True),
-    Column("amenity_id", Integer, ForeignKey("amenities.id"), primary_key=True),
+    Column("hotel_id", Integer, ForeignKey("hotels.id", ondelete="CASCADE"), primary_key=True),
+    Column("amenity_id", Integer, ForeignKey("amenities.id", ondelete="CASCADE"), primary_key=True),
 )
