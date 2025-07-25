@@ -23,3 +23,6 @@ class HotelSearchResult(BaseModel):
     min_no_guests: int
     max_no_guests: int
 
+class HotelSearchResponse(BaseModel):
+    session_id: str
+    results: List[HotelSearchResult]
