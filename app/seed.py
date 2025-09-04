@@ -132,7 +132,7 @@ db.commit()
 hotels = []
 for state in states_cities:
     for _ in range(30):
-        hotel_name = f"{fake.last_name()} {random.choice(['Hotel', 'Resort', 'Suites', 'Inn', 'Hotels'])}"
+        hotel_name = f"{fake.last_name()} {random.choice(['Hotel', 'Resort', 'Suites', 'Lodgings', 'Hotels'])}"
         city = random.choice(states_cities[state])
         address = f"{fake.building_number()}, {fake.street_name()}, {city}, {state} State"
         description = generate_hotel_description(hotel_name, city)
