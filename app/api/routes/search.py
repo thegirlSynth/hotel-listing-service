@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.auth.dependencies import get_db
 from app.schemas.search import HotelSearchResponse, HotelSearchResult
-from app.services.hotel_search_service import perform_full_search, filter_cached_hotels
+from app.services.hotel_search_service import perform_full_search, filter_cached_hotels, return_all
 from app.services.redis_service import store_search_session
 
 
@@ -22,7 +22,7 @@ def search_hotels(
     return {"session_id": session_id, "results": hotels}
 
 
-@router.get("/filter-hotels", response_model=list[HotelSearchResult])
+@router.get("/filter-hotels", response_model=list[HotelSearchResult], description="This is the endpoint for performing any kind of hotel filtering, from all categories including all stays, editor's pick, luxury, bugget etc.")
 def filter_hotels(
     session_id: str = Query(...),
     minprice: int = Query(None),
@@ -34,3 +34,10 @@ def filter_hotels(
 ):
     hotels = filter_cached_hotels(db, session_id, minprice, maxprice, amenities, area, rating)
     return hotels
+
+
+@router.get("/all-stays", response_model=HotelSearchResponse, description="This returns all the hotels in the database.")
+def all_stays(db: Session = Depends(get_db)):
+    hotels, hotel_ids = return_all(db)
+    session_id = store_search_session(hotel_ids)
+    return {"session_id": session_id, "results": hotels}
