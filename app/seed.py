@@ -34,52 +34,17 @@ def generate_hotel_description(hotel_name, city):
 
 states_cities = {
     "Lagos": [
-        "Ikeja", "Surulere", "Epe", "Badagry", "Ikorodu",
-        "Victoria Island", "Yaba", "Lekki", "Ajah", "Maryland"
-    ],
-    "Abuja": [
-        "Garki", "Wuse", "Asokoro", "Maitama", "Gwarinpa",
-        "Kubwa", "Utako", "Jabi", "Lugbe", "Lokogoma"
+        "Ikeja", "Epe", "Badagry", "Ikorodu",
+        "Victoria Island", "Yaba", "Lekki", "Maryland"
     ],
     "Rivers": [
-        "Port Harcourt", "Obio-Akpor", "Bonny", "Degema", "Eleme",
-        "Okrika", "Oyigbo", "Ahoada", "Omoku", "Bori"
+        "Port Harcourt"
     ],
     "Imo": [
-        "Owerri", "Orlu", "Okigwe", "Mbaitoli", "Oguta",
-        "Mbaise", "Nkwerre", "Obowo", "Isiala Mbano", "Ohaji"
+        "Owerri"
     ],
     "Enugu": [
-        "Enugu", "Nsukka", "Awgu", "Oji River", "Udi",
-        "Ngwo", "Emene", "Abakpa", "Nike", "Agbani"
-    ],
-    "Abia": [
-        "Umuahia", "Aba", "Ohafia", "Arochukwu", "Isiala Ngwa",
-        "Bende", "Ukwa", "Isuikwuato", "Ikwuano", "Osisioma"
-    ],
-    "Cross River": [
-        "Calabar", "Ogoja", "Obudu", "Ikom", "Ugep",
-        "Akamkpa", "Bekwarra", "Biase", "Yala", "Obanliku"
-    ],
-    "AkwaIbom": [
-        "Uyo", "Eket", "Ikot Ekpene", "Oron", "Abak",
-        "Etinan", "Ikot Abasi", "Essien Udim", "Ibesikpo", "Itu"
-    ],
-    "Plateau": [
-        "Jos", "Barkin Ladi", "Riyom", "Pankshin", "Langtang",
-        "Shendam", "Mangu", "Bokkos", "Wase", "Qua'an Pan"
-    ],
-    "Oyo": [
-        "Ibadan", "Ogbomoso", "Oyo", "Iseyin", "Eruwa",
-        "Saki", "Igboho", "Lalupon", "Fiditi", "Kishi"
-    ],
-    "Ogun": [
-        "Abeokuta", "Sagamu", "Ijebu Ode", "Ilaro", "Ota",
-        "Ijebu Igbo", "Owode", "Ayetoro", "Agbara", "Obada"
-    ],
-    "Delta": [
-        "Warri", "Asaba", "Sapele", "Ughelli", "Oghara",
-        "Ogwashi-Uku", "Agbor", "Kwale", "Burutu", "Abraka"
+        "Enugu"
     ]
 }
 
@@ -103,32 +68,49 @@ image_url = [
     ]
 
 #Add amenities to DB
-amenity_types = [
-    "Free Wi-Fi",
-    "Air Conditioning",
-    "Flat-Screen TV",
-    "Room Service",
-    "Complimentary Breakfast",
-    "Swimming Pool",
-    "Fitness Center",
-    "Spa & Wellness Center",
-    "Mini Bar",
-    "Laundry Service",
-    "24-Hour Front Desk",
-    "Parking",
-    "Airport Shuttle",
-    "Pet-Friendly Rooms",
-    "In-Room Safe",
+premium_amenity_types = [
+    "Pool",
+    "Gym/Fitness Center",
+    "Spa/Wellness Center",
+    "Fine Dining",
+    "Rooftop Lounge/Bar",
+    "Concierge Service",
+    "Laundry/Butler Service",
+    "Private Lounge/Executive Floor",
+    "Valet Parking",
+    "Conference/Event Hall",
+    "In-Room Entertainment System",
+    "Private Balcony/View Rooms"
 ]
 
-amenities = []
-for name in amenity_types:
+budget_amenity_types = [
+    "Free Wi-Fi",
+    "Air Conditioning/Fan",
+    "Clean Bathroom",
+    "Comfortable Bed",
+    "Secure Entry",
+    "Low Noise Level",
+    "Basic Room Cleaning",
+    "TV/Entertainment Option",
+    "Free Parking",
+    "24/7 Front Desk/Contact "
+]
+
+premium_amenities = []
+for name in premium_amenity_types:
     amenity = Amenity(name=name)
     db.add(amenity)
-    amenities.append(amenity)
+    premium_amenities.append(amenity)
 db.commit()
 
-# Add 30 hotels per state
+budget_amenities = []
+for name in budget_amenity_types:
+    amenity = Amenity(name=name)
+    db.add(amenity)
+    budget_amenities.append(amenity)
+db.commit()
+
+# Add 30 hotels per state_city
 hotels = []
 for state in states_cities:
     for _ in range(30):
@@ -137,10 +119,14 @@ for state in states_cities:
         address = f"{fake.building_number()}, {fake.street_name()}, {city}, {state} State"
         description = generate_hotel_description(hotel_name, city)
         is_featured = random.choice([True, False])
-        category = random.choice(["luxury", ""])
+        is_editors_pick = random.choice([True, False])
+        is_budget = random.choice([True, False])
+        is_luxury = not is_budget
         image = random.choice(image_url)
         star_rating = random.randint(20, 50) / 10
         views_count = random.randint(10, 200)
+        amenities = (random.sample(premium_amenities, k=random.randint(1, 12))
+                           + random.sample(budget_amenities, k=random.randint(1, 10)))
 
 
         hotel = Hotel(
@@ -153,16 +139,17 @@ for state in states_cities:
             country="Nigeria",
             star_rating=star_rating,
             is_featured=is_featured,
-            category=category,
+            is_budget=is_budget,
+            is_luxury=is_luxury,
+            is_editors_pick=is_editors_pick,
             views_count=views_count,
             image=image,
+            amenities=amenities
             )
-        #add random amenities
-        hotel.amenities = random.sample(amenities, k=random.randint(3, 7))
 
-        db.add(hotel)
         hotels.append(hotel)
 
+db.add_all(hotels)
 db.commit()
 
 # Add rooms to hotels
