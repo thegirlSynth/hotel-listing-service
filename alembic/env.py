@@ -22,6 +22,7 @@ from app.models.user import User, RoleEnum
 from app.models.booking import Booking
 from app.models.hotel import Hotel
 from app.models.room import Room
+from app.models.hotel_evaluation import HotelEvaluation
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
