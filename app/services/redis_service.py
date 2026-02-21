@@ -4,11 +4,11 @@ import json
 
 
 r = redis.Redis(
-    host='redis-12465.c11.us-east-1-3.ec2.redns.redis-cloud.com',
-    port=12465,
+    host='redis-10137.c12.us-east-1-4.ec2.cloud.redislabs.com',
+    port=10137,
     decode_responses=True,
     username="default",
-    password="3CKySbhvbUODLzZx4shl8bjZLzwd8VuT",
+    password="TrDw48WTAC1aVYD3bGrYmDewItTHAoKF",
 )
 
 
